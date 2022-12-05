@@ -15,6 +15,7 @@ type AuthService interface {
 	VerifyCredential(email string, password string) interface{}
 	CreateUser(user dto.RegisterDTO) entity.User
 	IsDuplicateEmail(email string) bool
+	GetAllUsers() []entity.Users
 }
 
 type authService struct {
@@ -47,6 +48,7 @@ func (service *authService) CreateUser(user dto.RegisterDTO) entity.User {
 	if err != nil {
 		log.Fatalf("Failde map %v", err)
 	}
+	userToCreate.Role = "admin"
 	res := service.userRepository.CreateUser(userToCreate)
 	return res
 }
@@ -64,4 +66,8 @@ func comparePassword(hashedPwd string, plainPassword []byte) bool {
 func (service *authService) IsDuplicateEmail(email string) bool {
 	res := service.userRepository.IsDuplicateEmail(email)
 	return !(res.Error == nil)
+}
+
+func (service *authService) GetAllUsers() []entity.Users {
+	return service.userRepository.GetAllUsers()
 }

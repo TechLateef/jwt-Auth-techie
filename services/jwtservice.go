@@ -6,15 +6,17 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	entity "github.com/techlateef/jwt-Auth-techies/entities"
 )
 
 type JWTService interface {
-	GeneratedToken(userID string) string
+	GeneratedToken(Role, userID string) string
 	ValidateToken(token string) (*jwt.Token, error)
 }
 
 // this contains the payload Register claims
 type jwtCustomClaim struct {
+	Role   string `json:"role"`
 	UserID string `json:"user_id"`
 	jwt.StandardClaims
 }
@@ -43,9 +45,12 @@ func getSecretKey() string {
 }
 
 // this generate the token using the the header whic is hs256, claims and secret key
-func (j *jwtService) GeneratedToken(UserID string) string {
+func (j *jwtService) GeneratedToken(Role, userID string) string {
+	var user entity.User
 	claims := &jwtCustomClaim{
-		UserID,
+
+		user.Role,
+		string(rune(user.ID)),
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().AddDate(1, 0, 0).Unix(),
 			Issuer:    j.issuer,

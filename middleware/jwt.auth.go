@@ -14,14 +14,20 @@ func AuthorizeJWT(jwtService service.JWTService) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		authHeader := ctx.GetHeader("Authorization")
 		if authHeader == "" {
+
 			ctx.JSON(http.StatusBadRequest, gin.H{"Error": "failed to process"})
 			return
 		}
 		token, err := jwtService.ValidateToken(authHeader)
+
 		if token.Valid {
 			claims := token.Claims.(jwt.MapClaims)
-			log.Println("Claim[user_id]: ", claims["user_id"])
-			log.Println("Claim[issuer]: ", claims["issuer"])
+			{
+				log.Println("Claim[role]: ", claims["role"])
+				log.Println("Claim[user_id]: ", claims["user_id"])
+				log.Println("Claim[issuer]: ", claims["issuer"])
+			}
+
 		} else {
 			log.Println(err)
 			ctx.JSON(http.StatusBadRequest, err.Error())

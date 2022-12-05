@@ -9,6 +9,7 @@ type UserRepository interface {
 	CreateUser(user entity.User) entity.User
 	VerifyCredential(email string, password string) interface{}
 	IsDuplicateEmail(email string) (tx *gorm.DB)
+	GetAllUsers() []entity.Users
 }
 
 type userRepository struct {
@@ -23,7 +24,7 @@ func NewUserRepository(userRepo *gorm.DB) UserRepository {
 
 func (db *userRepository) CreateUser(user entity.User) entity.User {
 	db.connection.Save(&user)
-	db.connection.Preload("User").Find(&user)
+	db.connection.Preload("Users").Find(&user)
 	return user
 }
 
@@ -39,4 +40,10 @@ func (db *userRepository) VerifyCredential(email string, password string) interf
 func (db *userRepository) IsDuplicateEmail(email string) (tx *gorm.DB) {
 	var user entity.User
 	return db.connection.Where("email = ?", email).Take(&user)
+}
+
+func (db *userRepository) GetAllUsers() []entity.Users {
+	var users []entity.Users
+	db.connection.Find(&users)
+	return users
 }

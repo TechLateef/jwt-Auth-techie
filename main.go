@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/techlateef/jwt-Auth-techies/config"
 	"github.com/techlateef/jwt-Auth-techies/controllers"
+	"github.com/techlateef/jwt-Auth-techies/middleware"
 	"github.com/techlateef/jwt-Auth-techies/repository"
 	service "github.com/techlateef/jwt-Auth-techies/services"
 	"gorm.io/gorm"
@@ -27,5 +28,9 @@ func main() {
 		authRoute.POST("/register", authController.Register)
 	}
 
+	userRoute := r.Group("users")
+	{
+		userRoute.GET("/", middleware.AuthorizeJWT(jwtService), authController.GetUsers)
+	}
 	r.Run()
 }

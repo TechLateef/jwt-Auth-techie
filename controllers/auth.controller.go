@@ -1,8 +1,10 @@
 package controllers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -15,6 +17,7 @@ import (
 type AuthController interface {
 	Login(ctx *gin.Context)
 	Register(ctx *gin.Context)
+	GetUsers(ctx *gin.Context)
 }
 
 type authController struct {
@@ -38,7 +41,8 @@ func (c *authController) Login(ctx *gin.Context) {
 	}
 	authResult := c.authService.VerifyCredential(loginDto.Email, loginDto.Password)
 	if v, ok := authResult.(entity.User); ok {
-		generateToken := c.jwtService.GeneratedToken(strconv.FormatUint(v.ID, 10))
+		generateToken := c.jwtService.GeneratedToken(strconv.FormatUint(v.ID, 10), v.Role)
+		fmt.Println(v.Role)
 		v.Token = generateToken
 		ctx.JSON(http.StatusOK, v)
 		return
@@ -61,10 +65,19 @@ func (c *authController) Register(ctx *gin.Context) {
 			log.Fatalf("failed to hash password %v ", err)
 		}
 		registerDto.Password = string(hash)
+
 		createUser := c.authService.CreateUser(registerDto)
-		token := c.jwtService.GeneratedToken(strconv.FormatUint(createUser.ID, 10))
+
+		token := c.jwtService.GeneratedToken(createUser.Role, strconv.FormatUint(createUser.ID, 10))
 		createUser.Token = token
 		ctx.JSON(http.StatusOK, createUser)
 
 	}
+}
+
+func (c *authController) GetUsers(ctx *gin.Context) {
+	var users []entity.Users = c.authService.GetAllUsers()
+
+	ctx.JSON(http.StatusOK, users)
+
 }
