@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -23,9 +24,17 @@ func AuthorizeJWT(jwtService service.JWTService) gin.HandlerFunc {
 		if token.Valid {
 			claims := token.Claims.(jwt.MapClaims)
 			{
-				log.Println("Claim[role]: ", claims["role"])
+
 				log.Println("Claim[user_id]: ", claims["user_id"])
 				log.Println("Claim[issuer]: ", claims["issuer"])
+
+			}
+			role := fmt.Sprintf("%v", claims["role"])
+			if role == "admin" {
+				log.Println("Admin User : Access granted")
+			} else {
+				res := "Non Admin User : Access denied"
+				ctx.AbortWithStatusJSON(http.StatusUnauthorized, res)
 			}
 
 		} else {

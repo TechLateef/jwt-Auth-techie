@@ -48,7 +48,7 @@ func (service *authService) CreateUser(user dto.RegisterDTO) entity.User {
 	if err != nil {
 		log.Fatalf("Failde map %v", err)
 	}
-	userToCreate.Role = "admin"
+
 	res := service.userRepository.CreateUser(userToCreate)
 	return res
 }
